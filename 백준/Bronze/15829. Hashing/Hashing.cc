@@ -6,10 +6,8 @@ using namespace std;
 using namespace std;
 
 int main() {
-    long long M = 1234567891, ret = 0;
+    long long M = 1234567891, ret = 0, asc = 0, r = 1;
     int L;
-    int asc = 0, r = 1;
-
     string str = "";
     cin >> L >> str;
 
