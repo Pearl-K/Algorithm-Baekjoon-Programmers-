@@ -1,7 +1,5 @@
 import sys
 input = sys.stdin.readline
-sys.setrecursionlimit(10**6)
-
 N = int(input())
 M = int(input())
 parent = [i for i in range(N+1)]
@@ -39,7 +37,6 @@ def floyd():
                     ppl[p][q] = ppl[p][r] + ppl[r][q]
 
 floyd()
-
 for i in range(N+1):
     for j in range(N+1):
         if ppl[i][j] == INF:
@@ -53,8 +50,6 @@ for i in range(1, N+1):
 p_set = set(parent[1:])
 p_list = list(p_set)
 p_len = len(p_list)
-
-
 print(p_len)
 res = []
 for i in range(p_len):
