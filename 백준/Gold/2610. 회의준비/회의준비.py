@@ -1,13 +1,12 @@
 import sys
 input = sys.stdin.readline
-
-n = int(input().rstrip())
-m = int(input().rstrip())
+n = int(input())
+m = int(input())
 INF = sys.maxsize
 graph = [[INF]*(n+1) for _ in range(n+1)]
 
 for i in range(m):
-    x, y = map(int, input().rstrip().split())
+    x, y = map(int, input().split())
     graph[x][y] = 1
     graph[y][x] = 1
 
@@ -47,20 +46,17 @@ for i in range(1, n+1):
         if graph[i][j] >= 1:
             union(i, j)
     
-community = list(set(parent))
-
-ans_list = []
-for i in range(1, len(community)):
-    temp = INF
-    tempIndex = -1
+U = list(set(parent))
+res = []
+for i in range(1, len(U)):
+    tmp = INF
+    tmpidx = -1
     for j in range(1, n+1):
-        if community[i] == parent[j] and temp > max(graph[j]):
-            temp = max(graph[j])
-            tempIndex = j
-    ans_list.append(tempIndex)
-
-ans_list.sort()
-print(len(ans_list))
-
-for i in ans_list:
-    print(i)
+        if U[i] == parent[j] and tmp > max(graph[j]):
+            tmp = max(graph[j])
+            tmpidx = j
+    res.append(tmpidx)
+res.sort()
+print(len(res))
+for r in res:
+    print(r)
