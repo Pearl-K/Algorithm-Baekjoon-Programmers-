@@ -1,62 +1,69 @@
 import sys
 input = sys.stdin.readline
-n = int(input())
-m = int(input())
-INF = sys.maxsize
-graph = [[INF]*(n+1) for _ in range(n+1)]
+sys.setrecursionlimit(10**6)
 
-for i in range(m):
-    x, y = map(int, input().split())
-    graph[x][y] = 1
-    graph[y][x] = 1
+N = int(input())
+M = int(input())
+parent = [i for i in range(N+1)]
 
-for i in range(1, n+1):
-    graph[i][i] = 0
+def find_p(x):
+    if parent[x] == x:
+        return x
+    x = find_p(parent[x])
+    return x
 
-for k in range(1, n+1):
-    for i in range(1, n+1):
-        for j in range(1, n+1):
-            graph[i][j] = min(graph[i][j], graph[i][k] + graph[k][j])
-
-for i in range(n+1):
-    for j in range(n+1):
-        if graph[i][j] == INF:
-            graph[i][j] = 0
-            
-parent = [i for i in range(n+1)]
-
-def find(target):
-    if target == parent[target]:
-        return target
-    
-    target = find(parent[target])
-    return target
-
-def union(a, b):
-    a = find(a)
-    b = find(b)
-    
-    if a < b:
-        parent[b] = a
+def union(x, y):
+    x = find_p(x)
+    y = find_p(y)
+    if x > y:
+        parent[x] = y
     else:
-        parent[a] = b
+        parent[y] = x
 
-for i in range(1, n+1):
-    for j in range(i+1, n+1):
-        if graph[i][j] >= 1:
+INF = sys.maxsize
+ppl = [[INF for j in range(N+1)] for i in range(N+1)]
+
+for _ in range(M):
+    a, b = map(int, input().split())
+    ppl[a][b] = 1
+    ppl[b][a] = 1
+
+for i in range(1, N+1):
+    ppl[i][i] = 0
+
+def floyd():
+    for r in range(1, N+1):
+        for p in range(1, N+1):
+            for q in range(1, N+1):
+                if ppl[p][q] > ppl[p][r] + ppl[r][q]:
+                    ppl[p][q] = ppl[p][r] + ppl[r][q]
+
+floyd()
+
+for i in range(N+1):
+    for j in range(N+1):
+        if ppl[i][j] == INF:
+            ppl[i][j] = 0
+
+for i in range(1, N+1):
+    for j in range(i+1, N+1):
+        if ppl[i][j] >= 1:
             union(i, j)
-    
-U = list(set(parent))
+
+p_set = set(parent[1:])
+p_list = list(p_set)
+p_len = len(p_list)
+
+
+print(p_len)
 res = []
-for i in range(1, len(U)):
+for i in range(p_len):
     tmp = INF
     tmpidx = -1
-    for j in range(1, n+1):
-        if U[i] == parent[j] and tmp > max(graph[j]):
-            tmp = max(graph[j])
+    for j in range(1, N+1):
+        if p_list[i] == parent[j] and tmp > max(ppl[j]): #같은 위원회
+            tmp = max(ppl[j])
             tmpidx = j
     res.append(tmpidx)
 res.sort()
-print(len(res))
-for r in res:
-    print(r)
+print(*res, sep="\n")
