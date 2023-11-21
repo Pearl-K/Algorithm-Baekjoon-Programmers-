@@ -4,15 +4,19 @@
 
 ### 성능 요약
 
-메모리: 331444 KB, 시간: 1620 ms
+메모리: 331576 KB, 시간: 1596 ms
 
 ### 분류
 
 다이나믹 프로그래밍
 
+### 제출 일자
+
+2023년 9월 29일 18:20:12
+
 ### 문제 설명
 
-<p style="text-align: center;"><img alt="" src="https://upload.acmicpc.net/3051e512-937e-4f4d-b0e1-dc6f7d4308ef/-/preview/" style="width: 50%;"></p>
+<p style="text-align: center;"><img alt="" src="" style="width: 50%;"></p>
 
 <p><b>디지털 트윈</b>은 현실 속 환경을 디지털 가상 공간에 복제하여 물리 환경에서 발생 가능한 상황을 예측하고 최적화하는 기술이다.</p>
 
@@ -49,7 +53,7 @@
 
 <p>예시로 다음 그림을 살펴보자. 3, 4번 그림은 정답이 아닌 컨테이너 벨트의 상태를 나타낸다.</p>
 
-<p style="text-align: center;"><img alt="" src="https://upload.acmicpc.net/103662aa-bfcc-43c4-bbd4-09bea24135b2/-/preview/" style="width: 80%;"></p>
+<p style="text-align: center;"><img alt="" src="" style="width: 80%;"></p>
 
 <ul>
 	<li>첫 번째 그림은 공장의 상태와 생산 기계들의 상태를 보여준다.</li>

@@ -1,6 +1,5 @@
 import sys
 input = sys.stdin.readline
-
 N = int(input())
 mac = [[] for i in range(N+1)]
 
@@ -26,7 +25,6 @@ for i in range(1, N+1):
         c[i] = 1
 
 dp[1][1] = r[1]
-
 for i in range(2, N+1):
     #dp[0][i] : li에 도착하고 최소
     if c[i] == 1:
