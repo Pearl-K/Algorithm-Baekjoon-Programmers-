@@ -23,4 +23,5 @@ for i in range(N):
         res = alp[int(r)][idx]
     else:
         res = alp[int(r)][idx]-alp[int(l)-1][idx]
+
     print(res)
