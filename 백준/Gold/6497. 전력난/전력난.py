@@ -15,11 +15,12 @@ def union(u, v):
     else:
         par[u] = v
 
+
 def kruskal():
     res = 0
-    while edges:
-        cost, x, y = hq.heappop(edges)
 
+    for i in range(len(edges)):
+        cost, x, y = edges[i][0], edges[i][1], edges[i][2]
         if find_p(x) != find_p(y):
             union(x, y)
             res += cost
@@ -35,7 +36,8 @@ while True:
     par = [i for i in range(M+1)]
 
     for _ in range(N):
-        line = list(map(int, input().split()))
-        cost_s += line[2]
-        hq.heappush(edges, (line[2], line[0], line[1])) #z 가중치를 기준으로 min heap에 넣기
+        x, y, z = list(map(int, input().split()))
+        cost_s += z
+        edges.append((z, x, y))
+    edges.sort() #그냥 간선 정렬이랑 pq랑 속도 차이가 얼마나 날까...
     print(cost_s-kruskal())
