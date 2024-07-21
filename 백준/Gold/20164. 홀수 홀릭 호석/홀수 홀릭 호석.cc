@@ -33,7 +33,7 @@ pair<int, int> dfs(string str, int cnt){
         return dfs(to_string(tmp), cnt);
     } else {
         for(int i = 1; i < sLen-1; i++){
-            for(int j = i+1; j < sLen-1; j++){
+            for(int j = i+1; j < sLen; j++){
 
                 string s1 = str.substr(0,i); // 0 ~ i
                 string s2 = str.substr(i,j-i); //i+1 ~ j
