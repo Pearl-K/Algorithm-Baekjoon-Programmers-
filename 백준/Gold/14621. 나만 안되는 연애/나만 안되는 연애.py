@@ -1,6 +1,6 @@
 import sys
 input = sys.stdin.readline
-sys.setrecursionlimit(10**5)
+sys.setrecursionlimit(10**4)
 
 N, M = map(int, input().split())
 gender = ['_']
