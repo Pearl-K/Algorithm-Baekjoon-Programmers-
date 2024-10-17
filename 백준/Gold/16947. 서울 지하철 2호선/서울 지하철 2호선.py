@@ -1,7 +1,6 @@
 # 문제 접근
 # 1. 사이클 그래프 찾기
 # 2. 사이클 그래프로부터 각 노드 도달거리 탐색하기
-# 알고리즘
 
 import sys
 input = sys.stdin.readline
