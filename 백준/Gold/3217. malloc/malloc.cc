@@ -5,7 +5,6 @@
 using namespace std;
 int N;
 unordered_map<string, pair<int, int>> varMap;  // 변수 이름, {메모리 시작 위치, 크기}
-set<pair<int, int>> allocSgmt;  // 할당된 구간 {시작 위치, 끝 위치}
 set<pair<int, int>> freeSgmt = {{1, 100000}};  // 빈 구간 초기화
 
 // malloc: 메모리 할당
@@ -13,28 +12,23 @@ int malloc(int size) {
     for (auto it = freeSgmt.begin(); it != freeSgmt.end(); ++it) {
         int start = it->first;
         int end = it->second;
-        int available_size = end - start + 1;
+        int availableSize = end - start + 1;
 
         // 빈 구간에서 할당할 구간 분리
-        if (available_size >= size) {
+        if (availableSize >= size) {
             freeSgmt.erase(it);
 
-            if (available_size > size) freeSgmt.insert({start + size, end});
-            allocSgmt.insert({start, start + size - 1});
-
-            return start;  // 시작 위치 리턴
+            if (availableSize > size) freeSgmt.insert({start + size, end});
+            return start; // 시작 위치 리턴
         }
     }
-    return 0;  // 할당 실패
+    return 0; // 할당 실패
 }
 
 // free: 메모리 해제
 void free(int start, int size) {
     int end = start + size - 1;
-
-    // 할당된 구간 해제
-    allocSgmt.erase({start, end});
-
+    
     // 해제 후 구간 원복 (이전 구간 및 다음 구간과 병합)
     auto it = freeSgmt.lower_bound({start, end});
     if (it != freeSgmt.begin()) {
@@ -55,7 +49,6 @@ void free(int start, int size) {
 void checkCommand(string comm) {
     if (comm.find("malloc") != -1) { // malloc 호출 후 변수 정보 추가
         string varName = comm.substr(0, comm.find('='));
-
         int sizeSt = comm.find('(') + 1;
         int sizeEd= comm.find(')');
         int size = stoi(comm.substr(sizeSt, sizeEd - sizeSt));
@@ -88,10 +81,12 @@ void checkCommand(string comm) {
 int main() {
     cin.tie(0)->sync_with_stdio(0);
     cin >> N;
+
     string command;
     for (int i = 0; i < N; i++) {
         cin >> command;
         checkCommand(command);
     }
+
     return 0;
 }
