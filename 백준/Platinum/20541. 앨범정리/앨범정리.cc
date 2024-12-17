@@ -1,190 +1,168 @@
 #include <iostream>
 #include <map>
 #include <set>
-#include <string>
-#include <vector>
 using namespace std;
+using ll = long long;
+int N;
+string comm, arg;
 
+// 1. 앨범 상태를 표현할 앨범 구조체
 struct Album {
-    string name; // 현재 앨범 이름
-    set<string> photos; // 사진 저장 (사전순 정렬, 중복 방지)
-    map<string, Album*> subAlbums; // 하위 앨범 저장 (사전순 정렬)
-    Album* parent; // 상위 앨범 (nullptr 이면 최상위 앨범)
+    Album* parent;
+    string name; // 앨범 이름
+    map<string, Album*> albs; // 하위 앨범 패키지 관리
+    set<string> pics; // 하위 소속 사진들 관리
+    int albSize;
+    int picSize;
 
-    // 생성자
-    Album(string name, Album* parent = nullptr)
-            : name(name), parent(parent) {}
-
-    // 소멸자
-    ~Album() {
-        for (auto& [_, album] : subAlbums) {
-            delete album; // 하위 앨범 메모리 해제
-        }
-    }
+    Album(string name, Album* parent)
+        : parent(parent), name(name), albSize(0), picSize(0) {}
 };
 
-struct AlbumManager {
-    Album* root;
-    Album* current;
+// alb 관련 명령어
+void mkalb(Album *cur, const string& arg) {
+    auto pos = cur->albs.lower_bound(arg);
 
-    // 생성자: 최상위 앨범 생성
-    AlbumManager() {
-        root = new Album("album");
-        current = root;
-    }
-
-    // 소멸자: 최상위 앨범 메모리 해제
-    ~AlbumManager() {
-        delete root;
-    }
-
-    void mkalb(const string& name) {
-        if (current->subAlbums.count(name)) {
-            cout << "duplicated album name\n";
-            return;
+    if (pos != cur->albs.end() && pos->first == arg) {
+        cout << "duplicated album name\n";
+    } else {
+        cur->albs.emplace_hint(pos, arg, new Album(arg, cur));
+        while (cur != nullptr) {
+            cur->albSize++; // 현재 앨범 사이즈 업데이트
+            cur = cur->parent;
         }
-        current->subAlbums[name] = new Album(name, current);
+    }
+}
+
+void rmalb(Album *cur, const string& arg) {
+    if (cur->albs.empty()) {
+        cout << "0 0\n";
+        return;
     }
 
-    void rmalb(const string& name) {
-        if (name == "-1" || name == "0" || name == "1") {
-            rmalbByOrder(name);
-            return;
-        }
+    int albCnt = 0, picCnt = 0;
 
-        auto it = current->subAlbums.find(name);
-        if (it == current->subAlbums.end()) {
+    if (arg == "-1") {
+        auto pos = cur->albs.begin();
+        albCnt = pos->second->albSize + 1;
+        picCnt = pos->second->picSize;
+        cur->albs.erase(pos);
+    }
+    else if (arg == "0") {
+        albCnt = cur->albSize;
+        picCnt = cur->picSize - cur->pics.size();
+        cur->albs.clear();
+    }
+    else if (arg == "1") {
+        auto pos = --(cur->albs.end());
+        albCnt = pos->second->albSize + 1;
+        picCnt = pos->second->picSize;
+        cur->albs.erase(pos);
+    }
+    else {
+        auto pos = cur->albs.find(arg);
+        if (pos == cur->albs.end()) {
             cout << "0 0\n";
             return;
         }
-
-        int albumCount = 0, photoCount = 0;
-        countAlbumAndPhotos(it->second, albumCount, photoCount);
-
-        delete it->second;
-        current->subAlbums.erase(it);
-        cout << albumCount << " " << photoCount << "\n";
+        albCnt = pos->second->albSize + 1;
+        picCnt = pos->second->picSize;
+        cur->albs.erase(pos);
     }
 
-    void insert(const string& name) {
-        if (current->photos.count(name)) {
-            cout << "duplicated photo name\n";
-            return;
+    cout << albCnt << " " << picCnt << "\n";
+
+    while (cur != nullptr) { // 앨범, 사진 size update
+        cur->albSize -= albCnt;
+        cur->picSize -= picCnt;
+        cur = cur->parent;
+    }
+}
+
+Album* ca(Album* cur, Album* root, const string& arg) {
+    if (arg == ".." && cur != root) { // 상위 앨범 이동
+        return cur->parent;
+    }
+    else if (arg == "/") { // 최상위 앨범 이동
+        return root;
+    }
+    else { // 하위 앨범 이동
+        auto pos = cur->albs.find(arg);
+        if (pos != cur->albs.end()) {
+            return pos->second;
         }
-        current->photos.insert(name);
+    }
+    return cur; // 이동 실패 시 현재 위치
+}
+
+// pics 관련 명령어
+void insert(Album *cur, const string& arg) {
+    auto pos = cur->pics.lower_bound(arg);
+
+    if (pos != cur->pics.end() && *pos == arg) {
+        cout << "duplicated photo name\n";
+    } else {
+        cur->pics.emplace_hint(pos, arg);
+        while (cur != nullptr) { // 사진 사이즈 업데이트
+            cur->picSize++;
+            cur = cur->parent;
+        }
+    }
+}
+
+void del(Album *cur, const string& arg) {
+    if (cur->pics.empty()) {
+        cout << "0\n";
+        return;
     }
 
-    void deletePhoto(const string& name) {
-        if (name == "-1" || name == "0" || name == "1") {
-            deletePhotoByOrder(name);
-            return;
-        }
-
-        auto it = current->photos.find(name);
-        if (it == current->photos.end()) {
+    int picCnt = 0;
+    if (arg == "-1") {
+        picCnt = 1;
+        cur->pics.erase(cur->pics.begin());
+    }
+    else if (arg == "0") {
+        picCnt = cur->pics.size();
+        cur->pics.clear();
+    }
+    else if (arg == "1") {
+        picCnt = 1;
+        cur->pics.erase(--(cur->pics.end()));
+    }
+    else {
+        auto pos = cur->pics.find(arg);
+        if (pos == cur->pics.end()) {
             cout << "0\n";
             return;
         }
-        current->photos.erase(it);
-        cout << "1\n";
+        picCnt = 1;
+        cur->pics.erase(pos);
     }
 
-    void ca(const string& name) {
-        if (name == "/") {
-            current = root;
-        } else if (name == "..") {
-            if (current->parent) {
-                current = current->parent;
-            }
-        } else {
-            auto it = current->subAlbums.find(name);
-            if (it != current->subAlbums.end()) {
-                current = it->second;
-            }
-        }
-        cout << current->name << "\n";
+    cout << picCnt << "\n";
+    while (cur != nullptr) {
+        cur->picSize -= picCnt;
+        cur = cur->parent;
     }
-
-    void countAlbumAndPhotos(Album* album, int& albumCount, int& photoCount) {
-        albumCount++;
-        photoCount += album->photos.size();
-
-        for (auto& [_, subAlbum] : album->subAlbums) {
-            countAlbumAndPhotos(subAlbum, albumCount, photoCount);
-        }
-    }
-
-    void rmalbByOrder(const string& order) {
-        if (current->subAlbums.empty()) {
-            cout << "0 0\n";
-            return;
-        }
-
-        Album* target = nullptr;
-        if (order == "-1") {
-            target = current->subAlbums.begin()->second;
-        } else if (order == "1") {
-            target = current->subAlbums.rbegin()->second;
-        } else if (order == "0") {
-            int totalAlbums = 0, totalPhotos = 0;
-            for (auto& [_, album] : current->subAlbums) {
-                countAlbumAndPhotos(album, totalAlbums, totalPhotos);
-                delete album;
-            }
-            current->subAlbums.clear();
-            cout << totalAlbums << " " << totalPhotos << "\n";
-            return;
-        }
-
-        int albumCount = 0, photoCount = 0;
-        countAlbumAndPhotos(target, albumCount, photoCount);
-
-        current->subAlbums.erase(target->name);
-        delete target;
-
-        cout << albumCount << " " << photoCount << "\n";
-    }
-
-    void deletePhotoByOrder(const string& order) {
-        if (current->photos.empty()) {
-            cout << "0\n";
-            return;
-        }
-
-        if (order == "-1") {
-            current->photos.erase(current->photos.begin());
-        } else if (order == "1") {
-            current->photos.erase(prev(current->photos.end()));
-        } else if (order == "0") {
-            int photoCount = current->photos.size();
-            current->photos.clear();
-            cout << photoCount << "\n";
-            return;
-        }
-        cout << "1\n";
-    }
-};
+}
 
 int main() {
     cin.tie(0)->sync_with_stdio(0);
-    int N;
     cin >> N;
 
-    AlbumManager manager;
+    Album* root = new Album("album", 0); // 최상위 앨범 생성
+    Album* cur = root; // current 앨범
 
     while (N--) {
-        string comm, arg;
-        cin >> comm;
-        
-        if (comm == "mkalb" || comm == "rmalb" || comm == "insert" || comm == "delete" || comm == "ca") {
-            cin >> arg;
-            if (comm == "mkalb") manager.mkalb(arg);
-            else if (comm == "rmalb") manager.rmalb(arg);
-            else if (comm == "insert") manager.insert(arg);
-            else if (comm == "delete") manager.deletePhoto(arg);
-            else if (comm == "ca") manager.ca(arg);
+        cin >> comm >> arg;
+        if (comm == "mkalb") mkalb(cur, arg);
+        else if (comm == "rmalb") rmalb(cur, arg);
+        else if (comm == "insert") insert(cur, arg);
+        else if (comm == "delete") del(cur, arg);
+        else if (comm == "ca") {
+            cur = ca(cur, root, arg);  // 앨범 이동 후 cur 갱신
+            cout << cur->name << "\n";  // 현재 앨범 출력
         }
     }
-    
     return 0;
 }
