@@ -44,8 +44,8 @@ int main() {
         for(int i=1; i<=N; ++i) cin >> ranks[i];
         for(int i=1; i<=N; ++i) {
             for(int j=1; j<i; ++j) {
-                adj[ranks[i]][ranks[j]] = true;
-                inDegree[ranks[j]]++;
+                adj[ranks[j]][ranks[i]] = true;
+                inDegree[ranks[i]]++;
             }
         }
 
@@ -98,7 +98,7 @@ int main() {
         if(!isPossible) cout << "IMPOSSIBLE\n";
         else if(!isOneRet) cout << "?\n";
         else {
-            for(int i=N-1; i>=0 ; --i) cout << newRanks[i] << " ";
+            for(int i=0; i<N ; ++i) cout << newRanks[i] << " ";
             cout << "\n";
         }
     }
