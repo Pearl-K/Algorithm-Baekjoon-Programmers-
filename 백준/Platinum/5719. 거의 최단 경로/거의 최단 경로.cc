@@ -7,19 +7,10 @@ using ll = long long;
 using pii = pair<int, int>;
 using vi = vector<int>;
 using vpii = vector<pii>;
-
 const int INF = 1e9;
 int N, M;
 int adj[501][501];
 vi prevPath[501];
-
-/*
-    문제 풀이 접근
-    1. 다익스트라로 최단 거리 구하기 (비용)
-    2. 해당 최단 경로 비용과 같은 경로 모두 제외
-    3. 역추적 할 때 가능한 경우(비용 같을 때 다 넣기?)
-    4. 제거한 뒤, 다시 다익스트라 돌려서 비용 산정
- */
 
 int dijkstra(int st, int ed) {
     vi dist(501, INF);
@@ -55,7 +46,6 @@ int dijkstra(int st, int ed) {
     return (dist[ed] == INF) ? -1 : dist[ed];
 }
 
-// 종료 지점부터 역추적하면서 큐에 넣고 제거
 void removeSP(int ed) {
     queue<int> q;
     q.push(ed);
@@ -85,7 +75,6 @@ int main() {
         int S, D, u, v, w;
         cin >> S >> D;
 
-        // init
         memset(adj, -1, sizeof(adj));
         for(int i=0; i<501; ++i) prevPath[i].clear();
 
