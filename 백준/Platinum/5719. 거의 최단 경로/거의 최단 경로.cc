@@ -13,14 +13,6 @@ int N, M;
 int adj[501][501];
 vi prevPath[501];
 
-/*
-    문제 풀이 접근
-    1. 다익스트라로 최단 거리 구하기 (비용)
-    2. 해당 최단 경로 비용과 같은 경로 모두 제외
-    3. 역추적 할 때 가능한 경우(비용 같을 때 다 넣기?)
-    4. 제거한 뒤, 다시 다익스트라 돌려서 비용 산정
- */
-
 int dijkstra(int st, int ed) {
     vi dist(501, INF);
     dist[st] = 0;
@@ -60,7 +52,6 @@ void removeSP(int ed) {
     queue<int> q;
     q.push(ed);
     bool vst[501] = {false, };
-    vst[ed] = true;
 
     while(!q.empty()) {
         int node = q.front();
@@ -69,7 +60,7 @@ void removeSP(int ed) {
 
         for(int pNode : prevPath[node]) {
             adj[pNode][node] = -1;
-            
+
             if(!vst[pNode]) {
                 q.push(pNode);
             }
@@ -84,7 +75,7 @@ int main() {
     while(N != 0 && M !=0) {
         int S, D, u, v, w;
         cin >> S >> D;
-        
+
         // init
         memset(adj, -1, sizeof(adj));
         for(int i=0; i<501; ++i) prevPath[i].clear();
