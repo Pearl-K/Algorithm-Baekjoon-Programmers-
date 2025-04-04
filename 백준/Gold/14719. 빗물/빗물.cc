@@ -1,36 +1,30 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <vector>
+#include <algorithm>
 using namespace std;
 int H, W;
 int ret = 0;
-//빗물이 고이기 위해서는 시작점을 기준으로
-//내려갔다 올라가는 형태인지 판단하면 된다.
-
 int main() {
-    cin.tie(0)->ios_base::sync_with_stdio(false);
+    cin.tie(0)->sync_with_stdio(0);
     cin >> H >> W;
     vector<int> arr(W);
-
-    for(int i=0; i <W; i++){
-        cin >> arr[i];
-    }
-
+    for(int i=0; i <W; ++i) cin >> arr[i];  
     int st = 0;
     int ed = W-1;
-    int l, r, tmpMin;
+    int l, r, tmp;
 
     while(st <= ed){
-        tmpMin = min(arr[st], arr[ed]);
-        l = st+1; //l ~ r까지 구간 시작
+        tmp = min(arr[st], arr[ed]);
+        l = st+1;
         r = ed;
-
         while(l < r){
-            if(arr[l] < tmpMin){
-                ret += tmpMin - arr[l];
-                arr[l] = tmpMin;
+            if(arr[l] < tmp){
+                ret += tmp - arr[l];
+                arr[l] = tmp;
             }
             l++;
         }
-        if(tmpMin == arr[st]) st++;
+        if(tmp == arr[st]) st++;
         else ed--;
     }
     cout << ret;
